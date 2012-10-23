@@ -5,13 +5,14 @@
     <title>Picture Settings</title>
     <script class='remove'>
       var respecConfig = {
-          specStatus: "WG-DRAFT"
-      ,   shortName:  "Picture settings"
+          specStatus: "Member-SUBM"
+      ,   shortName:  "picture-settings"
       ,   editors: [
          {   name:       "Giridhar Mandyam"
                 ,   company:    "Qualcomm Innovation Center, Inc"
                 ,   companyURL: "http://www.qualcomm.com/about/businesses/quicinc" }
           ]
+      ,   edDraftURI:   "http://gmandyam.github.com/media-capture"
       ,   copyrightStart: 2012
       ,   noIDLIn:      true
       ,   wg:           "Media Capture Task Force"
@@ -36,11 +37,80 @@
     
     Introduction
     ------------
-    
-    <p class=issue>Various proposals have been provided to the Task Force regarding methods for taking a picture that can extend getUserMedia().
-    This proposal focused on picture settings that are compatible with the cameras associated with many handheld devices.  It leverages the takePicture method
+    <p>Various proposals have been provided to the Task Force regarding methods for taking a picture that can extend getUserMedia().
+    This proposal focused on picture settings that are compatible with the cameras associated with many handheld devices.  It leverages the takePicture() method
     as described in <a href=http://dvcs.w3.org/hg/dap/raw-file/tip/media-stream-capture/proposals/SettingsAPI_proposal_v4.html>Settings API Version 4</a>. </p>
     
+    <p>The takePicture() method is currently defined on a a PictureDeviceTrack according to
+    the cited proposal as follows:</p>
+    
+    <dl title='interface PictureDeviceTrack : VideoStreamTrack' class='idl'>
+    <dt>void takePicture ()</dt>
+    <dd>Temporarily mutes the owning VideoDeviceTrack's stream, then asynchronously switches the camera into "high resolution picture mode", applies the PictureDeviceTrack settings (a snapshot from the time the takePicture API was called, and records/encodes an image using a user-agent determined format into a Blob object. Finally, queues a task to fire a "picture" event with the resulting Blob instance.</dd>
+    <dt>attribute EventHandler onpicture</dt>
+    <dd>Register/unregister for "picture" events. The handler should expect to get a PictureEvent object as its first parameter.</dd>
+    </dl>
+    
+    <p>For the purposes of this proposal, the main focus is on the takePicture() method.  Whether a 
+    separate track is necessary to define this method is beyond the scope of this document.</p>
+    
+    Picture Settings
+    ----------------
+    <p>A new object type PictureSettings is defined as an argument to takePicture()</p>
+    <dl title='interface PictureDeviceTrack : VideoStreamTrack' class='idl'>
+    <dt>void takePicture (optional PictureSettings pictureSettings)</dt>
+    <dd>Temporarily mutes the owning VideoDeviceTrack's stream, then asynchronously switches the camera into "high resolution picture mode", applies the PictureDeviceTrack settings (a snapshot from the time the takePicture API was called, and records/encodes an image using a user-agent determined format into a Blob object. Finally, queues a task to fire a "picture" event with the resulting Blob instance.</dd>
+    <dt>attribute EventHandler onpicture</dt>
+    <dd>Register/unregister for "picture" events. The handler should expect to get a PictureEvent object as its first parameter.</dd>
+    </dl>
 
+    The PictureSettings interface
+    -----------------------------
+    <p>The PictureSettings interface must be supported by the User Agent.  However, any settings in this object
+    that are not supported by the User Agent or selected camera may be ignored.</p>
+    <dl title='interface PictureSettings' class='idl'>
+    <dt>attribute WhiteBalanceModeEnum whiteBalanceMode</dt>
+    <dd>This feature control the white balance mode setting</dd>
+    <dt>attribute ExposureModeEnum autoExposureMode</dt>
+    <dd>This feature control the auto exposure mode setting</dd>
+    <dt>attribute double exposureCompensation</dt>
+    <dd> This feature changes the exposure level for recorded images. Values are numeric</dd>
+    <dt>attribute boolean redEyeReduction</dt>
+    <dd> This feature turns on or off the camera red eye reduction - on is true</dd>
+    <dt>attribute unsigned long brightness</dt>
+    <dd>This feature controls the brightness setting of the camera - acceptable values are from 0.0 to 1.0</dd>
+    <dt>attribute unsigned long constrast</dt>
+    <dd>This feature controls the contrast setting of the camera - acceptable values are from 0.0 to 1.0</dd>
+    <dt>attribute unsigned long saturation</dt>
+    <dd>This feature controls the saturation setting of the camera - acceptable values are from 0.0 to 1.0</dd>
+    <dt>attribute unsigned long sharpness</dt>
+    <dd>This feature controls the sharpness setting of the camera - acceptable values are from 0.0 to 1.0</dd>
+    </dl>
+    <dl title='enum WhiteBalanceModeEnum' class='idl'>
+    <dt>auto</dt>
+    <dd>auto</dd>
+    <dt>incandescent</dt>
+    <dd>2500-3500 Kelvin</dd>
+    <dt>fluorescent</dt>
+    <dd>4000-5000 Kelvin</dd>
+    <dt>warm-fluorescent</dt>
+    <dd>5000-5500 Kelvin</dd>
+    <dt>daylight</dt>
+    <dd>5000-6500 Kelvin</dd>
+    <dt>cloudy-daylight</dt>
+    <dd>6500-8000 Kelvin</dd>
+    <dt>twilight</dt>
+    <dd>8000-9000 Kelvin</dd>
+    <dt>shade</dt>
+    <dd>9000-10000 Kelvin</dd>
+    </dl>
+    <dl title='enum ExposureModeEnum' class='idl'>
+    <dt>frame-average</dt>
+    <dd>Average of light information from entire scene</dd>
+    <dt>center-weighted</dt>
+    <dd>Sensitivity concentrated towards center of viewfinder</dd>
+    <dt>spot-metering</dt>
+    <dd>Spot-centered weighting</dd>
+    </dl>
   </body>
 </html>
