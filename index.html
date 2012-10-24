@@ -51,41 +51,64 @@
     <dd>Register/unregister for "picture" events. The handler should expect to get a PictureEvent object as its first parameter.</dd>
     </dl>
     
-    <p>For the purposes of this proposal, the main focus is on the takePicture() method.  Whether a 
-    separate track is necessary to define this method is beyond the scope of this document.</p>
+    <p>For the purposes of this proposal, the main focus is on the <code>PictureDeviceTrack</code> object and <code>takePicture()</code> method.  In addition, the <code>MediaSettingsRange</code> is leveraged.
+    </p>
     
-    Picture Settings
-    ----------------
-    <p>A new object type PictureSettings is defined as an argument to takePicture()</p>
-    <dl title='interface PictureDeviceTrack : VideoStreamTrack' class='idl'>
-    <dt>void takePicture (optional PictureSettings pictureSettings)</dt>
-    <dd>Temporarily mutes the owning VideoDeviceTrack's stream, then asynchronously switches the camera into "high resolution picture mode", applies the PictureDeviceTrack settings (a snapshot from the time the takePicture API was called, and records/encodes an image using a user-agent determined format into a Blob object. Finally, queues a task to fire a "picture" event with the resulting Blob instance.</dd>
-    <dt>attribute EventHandler onpicture</dt>
-    <dd>Register/unregister for "picture" events. The handler should expect to get a PictureEvent object as its first parameter.</dd>
+    <code>MediaSettingsRange</code>
+    -----------------
+    <dl title='interface MediaSettingsRange' class='idl'>
+    <dt>readonly attribute any max</dt>
+    <dd>The maximum value of this setting</dd>
+    <dt>readonly attribute any min</dt>
+    <dd>The minimum value of this setting</dd>
+    <dt>readonly attribute any initial</dt>
+    <dd>The initial value of this setting</dd>
+    <dt>void request (any value, optional boolean mandatory)</dt>
+    <dd>Creates an internal constraint based on the setting name with the provided value, adds that constraint into the pending constraint structure (to the MediaTrackConstraint array by default or replaces an entry in the MediaTrackConstraintSet if the mandatory flag is set) and queues a task (if not already queued) to process the pending constraint structure at the conclusion of this task.</dd>
     </dl>
-
-    The PictureSettings interface
-    -----------------------------
+    
+    <code>MediaSettingsItem</code>
+    -----------------
+    <p>The <code>MediaSettingsItem</code> interface is now defined, which allows for a single setting to be managed.</p>
+    <dl title='interface MediaSettingsItem' class='idl'>
+    <dt>readonly attribute any value</dt>
+    <dd>Value of current setting.</dd>
+    <dt>readonly attribute any initial</dt>
+    <dd>The initial value of this setting</dd>
+    <dt>void request (any value, optional boolean mandatory)</dt>
+    <dd>Creates an internal constraint based on the setting name with the provided value, adds that constraint into the pending constraint structure (to the MediaTrackConstraint array by default or replaces an entry in the MediaTrackConstraintSet if the mandatory flag is set) and queues a task (if not already queued) to process the pending constraint structure at the conclusion of this task.</dd>
+    </dl>
+    <p></p>
+    
+    <code>PictureSettings</code>
+    ---------------
+    <p>A new object  PictureSettings is defined to control the settings for takePicture().  <code>PictureDeviceTrack</code> implements <code>PictureSettings.</code></p>
     <p>The PictureSettings interface must be supported by the User Agent.  However, any settings in this object
     that are not supported by the User Agent or selected camera may be ignored.</p>
     <dl title='interface PictureSettings' class='idl'>
-    <dt>attribute WhiteBalanceModeEnum whiteBalanceMode</dt>
-    <dd>This feature control the white balance mode setting</dd>
-    <dt>attribute ExposureModeEnum autoExposureMode</dt>
-    <dd>This feature control the auto exposure mode setting</dd>
-    <dt>attribute double exposureCompensation</dt>
-    <dd> This feature changes the exposure level for recorded images. Values are numeric</dd>
-    <dt>attribute boolean redEyeReduction</dt>
-    <dd> This feature turns on or off the camera red eye reduction - on is true</dd>
-    <dt>attribute unsigned long brightness</dt>
-    <dd>This feature controls the brightness setting of the camera - acceptable values are from 0.0 to 1.0</dd>
-    <dt>attribute unsigned long constrast</dt>
-    <dd>This feature controls the contrast setting of the camera - acceptable values are from 0.0 to 1.0</dd>
-    <dt>attribute unsigned long saturation</dt>
-    <dd>This feature controls the saturation setting of the camera - acceptable values are from 0.0 to 1.0</dd>
-    <dt>attribute unsigned long sharpness</dt>
-    <dd>This feature controls the sharpness setting of the camera - acceptable values are from 0.0 to 1.0</dd>
+    <dt>attribute MediaSettingsItem whiteBalanceMode</dt>
+    <dd>This feature control the white balance mode setting. Values are of type <code>WhiteBalanceModeEnum</code>.</dd>
+    <dt>attribute MediaSettingsItem autoExposureMode</dt>
+    <dd>This feature control the auto exposure mode setting.  Values are of type <code>ExposureModeEnum</code>.</dd>
+    <dt>attribute MediaSettingsRange exposureCompensation</dt>
+    <dt>attribute MediaSettingsItem iso</dt>
+    <dd>This feature control the camera ISO setting.  Values are of type <code>ISOModeEnum</code>.</dd>
+    <dd> This feature changes the exposure level for recorded images. Values are numeric.</dd>
+    <dt>attribute MediaSettingsItem redEyeReduction</dt>
+    <dd> This feature turns on or off the camera red eye reduction and is boolean - on is true</dd>
+    <dt>attribute MediaSettingsRange brightness</dt>
+    <dd>This feature controls the brightness setting of the camera. Values are numeric.</dd>
+    <dt>attribute MediaSettingsRange constrast</dt>
+    <dd>This feature controls the contrast setting of the camera. Values are numeric.</dd>
+    <dt>attribute MediaSettingsRange saturation</dt>
+    <dd>This feature controls the saturation setting of the camera. Values are numeric.</dd>
+    <dt>attribute MediaSettingsRange sharpness</dt>
+    <dd>This feature controls the sharpness setting of the camera. Values are numeric.</dd>
     </dl>
+    <p></p>
+    
+    #####<code>WhiteBalanceModeEnum</code>
+    
     <dl title='enum WhiteBalanceModeEnum' class='idl'>
     <dt>auto</dt>
     <dd>auto</dd>
@@ -104,6 +127,10 @@
     <dt>shade</dt>
     <dd>9000-10000 Kelvin</dd>
     </dl>
+    <p></p>
+    
+    #####<code>ExposureModeEnum</code>
+    
     <dl title='enum ExposureModeEnum' class='idl'>
     <dt>frame-average</dt>
     <dd>Average of light information from entire scene</dd>
@@ -112,5 +139,54 @@
     <dt>spot-metering</dt>
     <dd>Spot-centered weighting</dd>
     </dl>
+    <p></p>
+    
+    #####<code>ISOModeEnum</code>
+    
+    <dl title='enum ISOModeEnum' class='idl'>
+    <dt>auto</dt>
+    <dd>Automatic adjustment</dd>
+    <dt>100</dt>
+    <dd>100 ASA rating</dd>
+    <dt>200</dt>
+    <dd>200 ASA rating</dd>
+    <dt>400</dt>
+    <dd>400 ASA rating</dd>
+    <dt>800</dt>
+    <dd>800 ASA rating</dd>
+    <dt>1250</dt>
+    <dd>1250 ASA rating</dd>
+    </dl>
+    <p></p>
+    
+    Example: Taking a picture after turning on Red Eye Reduction
+    -------
+    <pre class='example'>
+    navigator.getUserMedia({video: true}, gotMedia, failedToGetMedia);
+    
+    function gotMedia(mediastream) {
+       var videoDevice = mediastream.videoTracks[0];
+       // Check if this device supports a picture mode...
+       var pictureDevice = videoDevice.pictureTrack;
+       if (pictureDevice) {
+             pictureDevice.onpicture = showPicture;
+             if (pictureDevice.redEyeReduction) {
+                pictureDevice.redEyeReduction.request(true,true);
+                }
+             else
+                console.log('No red eye reduction');
+             pictureDevice.takePicture();
+             }
+           }
+
+    function showPicture(e) {
+           var img = document.querySelector("img");
+           img.src = URL.createObjectURL(e.data);
+           }
+           
+    function failedToGetMedia{
+       console.log('Stream failure');
+       }
+    </pre>
   </body>
 </html>
