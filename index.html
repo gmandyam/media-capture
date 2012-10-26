@@ -168,7 +168,7 @@
     function gotMedia(mediastream) {
        var videoDevice = mediastream.videoTracks[0];
        // Check if this device supports a picture mode...
-       var pictureDevice = videoDevice.pictureTrack;
+       var pictureDevice = videoDevice.pictureDeviceTrack;
        if (pictureDevice) {
              pictureDevice.onpicture = showPicture;
              if (pictureDevice.redEyeReduction) {
